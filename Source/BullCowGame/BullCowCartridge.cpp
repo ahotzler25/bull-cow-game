@@ -74,7 +74,7 @@ void UBullCowCartridge::ProcessGuess(FString Guess) {
     return;
 }
 
-bool UBullCowCartridge::IsIsogram(FString Guess) {
+bool UBullCowCartridge::IsIsogram(FString Guess) const {
 
     for (int32 i = 0; i < Guess.Len(); ++i) {
         for (int32 j = i + 1; j < Guess.Len(); ++j) {
