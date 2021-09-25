@@ -38,17 +38,29 @@ void UBullCowCartridge::ProcessGuess(FString Guess) {
     if (Guess == HiddenWord) {
         PrintLine(TEXT("Congrats! That's correct!"));
         EndGame();
-    } else {
-        PrintLine(TEXT("You've lost a life."));
-        PrintLine(TEXT("Lives: %i"), --Lives);
+        return;
+    } 
+    
+    if (Guess.Len() < HiddenWord.Len() || Guess.Len() > HiddenWord.Len()) {
+        PrintLine(TEXT("Your guess should be %i-letters long.\nPlease try again."), HiddenWord.Len());
+        return;
+    }
 
+    if (Guess != HiddenWord) {
+        --Lives;
         if (Lives > 0) {
-            if (Guess.Len() != HiddenWord.Len()) {
-                PrintLine(TEXT("Try again. Your guess should be %i-letters long."), HiddenWord.Len());
+            if (Lives > 1) {
+                PrintLine(TEXT("You lost a life.\nYou have %i lives remaining."), Lives);
+            } else {
+                PrintLine(TEXT("You lost a life.\nYou have %i life remaining."), Lives);
             }
-        } else {
-            PrintLine(TEXT("You have zero lives left."));
-            EndGame();
+            if (Guess.Len() == HiddenWord.Len()) {
+                PrintLine(TEXT("Please guess again."));
+                return;
+            }
         }
+
+        PrintLine(TEXT("You have zero lives left."));
+        EndGame();
     }
 }
