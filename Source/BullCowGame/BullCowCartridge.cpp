@@ -31,36 +31,45 @@ void UBullCowCartridge::SetupGame() {
 
 void UBullCowCartridge::EndGame() {
     bGameOver = true;
-    PrintLine(TEXT("Press enter to play again."));
+    PrintLine(TEXT("\nPress enter to play again."));
 }
 
 void UBullCowCartridge::ProcessGuess(FString Guess) {
     if (Guess == HiddenWord) {
+        ClearScreen();
         PrintLine(TEXT("Congrats! That's correct!"));
         EndGame();
         return;
     } 
     
-    if (Guess.Len() < HiddenWord.Len() || Guess.Len() > HiddenWord.Len()) {
+    if (Guess.Len() != HiddenWord.Len()) {
         PrintLine(TEXT("Your guess should be %i-letters long.\nPlease try again."), HiddenWord.Len());
         return;
     }
 
-    if (Guess != HiddenWord) {
-        --Lives;
-        if (Lives > 0) {
-            if (Lives > 1) {
-                PrintLine(TEXT("You lost a life.\nYou have %i lives remaining."), Lives);
-            } else {
-                PrintLine(TEXT("You lost a life.\nYou have %i life remaining."), Lives);
-            }
-            if (Guess.Len() == HiddenWord.Len()) {
-                PrintLine(TEXT("Please guess again."));
-                return;
-            }
+    // Check if isogram
+/*
+    if (!IsIsogram) {
+
+    }
+*/
+
+    --Lives;
+    if (Lives > 0) {
+        if (Lives > 1) {
+            PrintLine(TEXT("You lost a life.\nYou have %i lives remaining."), Lives);
+        } else {
+            PrintLine(TEXT("You lost a life.\nYou have %i life remaining."), Lives);
         }
 
-        PrintLine(TEXT("You have zero lives left."));
-        EndGame();
+        PrintLine(TEXT("Please guess again."));
+        return;
     }
+
+    // This is loss screen; separate function may be good, but not necessary at this point
+    ClearScreen();
+    PrintLine(TEXT("You have zero lives left."));
+    PrintLine(TEXT("The hidden word was: %s"), *HiddenWord);
+    EndGame();
+    return;
 }
