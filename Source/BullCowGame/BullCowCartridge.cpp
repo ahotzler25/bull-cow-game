@@ -1,20 +1,27 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "BullCowCartridge.h"
+#include "Misc/FileHelper.h"
+#include "Misc/Paths.h"
 
 void UBullCowCartridge::BeginPlay() // When the game starts
 {
     Super::BeginPlay();
-    SetupGame(); // Setting Up Game
+    const FString WordListPath = FPaths::ProjectContentDir() / TEXT("WordLists/HiddenWordList.txt");
+    FFileHelper::LoadFileToStringArray(Words, *WordListPath);
+    SetupGame();
+    for (int32 i = 0; i < 10; i++) {
+        if (Words[i].Len() >= 4 && Words[i].Len() <= 8) {
+            PrintLine(TEXT("%s"), *Words[i]);
+        }
+    }
 }
 
 void UBullCowCartridge::OnInput(const FString& Input) // When the player hits enter
 {
-    // if bGameOver is true ClearScreen() and SetupGame()
-    // else check PlayerGuess
     if (bGameOver) {
         ClearScreen();
         SetupGame();
-    } else { // checking PlayerGuess
+    } else {
         ProcessGuess(Input);
     }
 }
@@ -75,9 +82,8 @@ void UBullCowCartridge::ProcessGuess(FString Guess) {
 }
 
 bool UBullCowCartridge::IsIsogram(FString Guess) const {
-
-    for (int32 i = 0; i < Guess.Len(); ++i) {
-        for (int32 j = i + 1; j < Guess.Len(); ++j) {
+    for (int32 i = 0; i < Guess.Len(); i++) {
+        for (int32 j = i + 1; j < Guess.Len(); j++) {
             if (Guess[i] == Guess[j]) {
                 return false;
             }
