@@ -8,10 +8,13 @@ void UBullCowCartridge::BeginPlay() // When the game starts
 {
     Super::BeginPlay();
     const FString WordListPath = FPaths::ProjectContentDir() / TEXT("WordLists/HiddenWordList.txt");
-    FFileHelper::LoadFileToStringArray(Words, *WordListPath);
-
+    Isograms = GetValidWords(Words);
+    FFileHelper::LoadFileToStringArrayWithPredicate(Isograms, *WordListPath, [](const FString& Word)
+    {
+         return Word.Len() >= 4 && Word.Len() <= 8 && IsIsogram(Word);
+    });
     SetupGame();
-    PrintLine(TEXT("Number of valid words is %i"), GetValidWords(Words).Num());
+    PrintLine(TEXT("Number of valid words is %i"), Isograms.Num());
 }
 
 void UBullCowCartridge::OnInput(const FString& PlayerInput) // When the player hits enter
@@ -25,7 +28,7 @@ void UBullCowCartridge::OnInput(const FString& PlayerInput) // When the player h
 }
 
 void UBullCowCartridge::SetupGame() {
-    HiddenWord = GetValidWords(Words)[FMath::RandRange(0, GetValidWords(Words).Num() - 1)];
+    HiddenWord = Isograms[FMath::RandRange(0, Isograms.Num() - 1)];
     Lives = HiddenWord.Len();
     bGameOver = false;
     PrintLine(TEXT("Welcome to Bull Cow!"));
@@ -68,18 +71,21 @@ void UBullCowCartridge::ProcessGuess(const FString& Guess) {
         }
 
         PrintLine(TEXT("Please guess again."));
-        return;
+        // return;
+    } else {
+        // This is loss screen; separate function may be good, but not necessary at this point
+        ClearScreen();
+        PrintLine(TEXT("You have zero lives left."));
+        PrintLine(TEXT("The hidden word was: %s"), *HiddenWord);
+        EndGame();
     }
 
-    // This is loss screen; separate function may be good, but not necessary at this point
-    ClearScreen();
-    PrintLine(TEXT("You have zero lives left."));
-    PrintLine(TEXT("The hidden word was: %s"), *HiddenWord);
-    EndGame();
-    return;
+    int32 Bulls, Cows;
+    GetBullCows(Guess, Bulls, Cows);
+    PrintLine(TEXT("You have %i Bulls and %i Cows."), Bulls, Cows);
 }
 
-bool UBullCowCartridge::IsIsogram(const FString& Word) const {
+bool UBullCowCartridge::IsIsogram(const FString& Word) {
     for (int32 i = 0; i < Word.Len(); i++) {
         for (int32 j = i + 1; j < Word.Len(); j++) {
             if (Word[i] == Word[j]) {
@@ -101,4 +107,23 @@ TArray<FString> UBullCowCartridge::GetValidWords(const TArray<FString>& WordList
     }
 
     return ValidWords;
+}
+
+void UBullCowCartridge::GetBullCows(const FString& Guess, int32& BullCount, int32& CowCount) const {
+    BullCount = 0;
+    CowCount = 0;
+
+    for (int32 i = 0; i < Guess.Len(); i++) {
+        if (Guess[i] == HiddenWord[i]) {
+            BullCount++;
+            continue;
+        } 
+
+        for (int32 j = 0; j < Guess.Len(); j++) {
+            if (Guess[i] == HiddenWord[j]) {
+                CowCount++;
+                break;
+            }
+        }
+    }
 }
