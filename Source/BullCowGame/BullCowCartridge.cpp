@@ -2,7 +2,6 @@
 #include "BullCowCartridge.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
-// #include "Math/UnrealMathUtility.h" <-- this is already included in CoreMinimal.h
 
 void UBullCowCartridge::BeginPlay() // When the game starts
 {
@@ -13,6 +12,7 @@ void UBullCowCartridge::BeginPlay() // When the game starts
     {
          return Word.Len() >= 4 && Word.Len() <= 8 && IsIsogram(Word);
     });
+
     SetupGame();
     PrintLine(TEXT("Number of valid words is %i"), Isograms.Num());
 }
@@ -80,9 +80,15 @@ void UBullCowCartridge::ProcessGuess(const FString& Guess) {
         EndGame();
     }
 
-    int32 Bulls, Cows;
-    GetBullCows(Guess, Bulls, Cows);
-    PrintLine(TEXT("You have %i Bulls and %i Cows."), Bulls, Cows);
+    FBullCowCount BullCowInfo = GetBullCows(Guess);
+    PrintLine(TEXT("Bulls: %i -- Cows: %i."), BullCowInfo.BullsCount, BullCowInfo.CowsCount);
+    if (BullCowInfo.Bulls.Len() > 0) {
+        PrintLine(TEXT("Bulls found: %s"), *BullCowInfo.Bulls);
+    }
+    // if (BullCowInfo.Cows.Len() > 0) {
+    //     PrintLine(TEXT("Cows found: %s"), *BullCowInfo.Cows);
+    // }
+
 }
 
 bool UBullCowCartridge::IsIsogram(const FString& Word) {
@@ -109,21 +115,29 @@ TArray<FString> UBullCowCartridge::GetValidWords(const TArray<FString>& WordList
     return ValidWords;
 }
 
-void UBullCowCartridge::GetBullCows(const FString& Guess, int32& BullCount, int32& CowCount) const {
-    BullCount = 0;
-    CowCount = 0;
+
+// Addt feature: for each bull, put the correctly-guessed letter in its place on screen so player can see it
+// this makes it slightly easier for player to figure out the word
+FBullCowCount UBullCowCartridge::GetBullCows(const FString& Guess) const {
+    FBullCowCount Count;
 
     for (int32 i = 0; i < Guess.Len(); i++) {
         if (Guess[i] == HiddenWord[i]) {
-            BullCount++;
+            Count.BullsCount++;
+            Count.Bulls += Guess[i];
             continue;
-        } 
+        } else {
+            Count.Bulls += "_";
+        }
 
-        for (int32 j = 0; j < Guess.Len(); j++) {
+        for (int32 j = 0; j < HiddenWord.Len(); j++) {
             if (Guess[i] == HiddenWord[j]) {
-                CowCount++;
+                Count.CowsCount++;
+                // Count.Cows += Guess[j];
                 break;
             }
         }
     }
+
+    return Count;
 }
