@@ -17,8 +17,10 @@ Guessing incorrectly due to incorrect length or repeated letters will prompt pla
 2. Any correct letters in the wrong position are called "Cows", and will be displayed below the bulls. 
 <br/>
 3. No correct letters guessed (no cows or bulls) and the player will have to try again.
+
 ![No Bulls or Cows](/Screenshots/no-bulls-cows.PNG)
 
 <br/>
 If the player runs out of lives, the UI will display the hidden word and prompt the player to press enter to play again.
+
 ![Game Over Screen](/Screenshots/game-over-screen.PNG)
