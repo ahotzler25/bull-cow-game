@@ -11,5 +11,5 @@ Player has lives according to the length of the hidden word. Guessing correctly 
 3. No correct letters guessed (no cows or bulls) and the player will have to try again.
 ![No Bulls or Cows](/Screenshots/no-bulls-cows.PNG)
 
-If the player runs out of lives, the UI will display the hidden word and prompt the player press enter to play again.
+If the player runs out of lives, the UI will display the hidden word and prompt the player to press enter to play again.
 ![Game Over Screen](/Screenshots/game-over-screen.PNG)
