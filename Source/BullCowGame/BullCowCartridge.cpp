@@ -152,10 +152,10 @@ FBullCowCount UBullCowCartridge::GetBullCows(const FString& Guess) const {
             Count.Bulls += "_";
         }
 
-        for (int32 j = i + 1; j < HiddenWord.Len(); j++) {
+        for (int32 j = 0; j < HiddenWord.Len(); j++) {
             if (Guess[i] == HiddenWord[j]) {
                 Count.CowsCount++;
-                Count.Cows += Guess[j];
+                Count.Cows += Guess[i];
             }
         }
     }
