@@ -27,6 +27,7 @@ class BULLCOWGAME_API UBullCowCartridge : public UCartridge
 	static bool IsIsogram(const FString& Word);
 	TArray<FString> GetValidWords(const TArray<FString>& WordList) const;
 	FBullCowCount GetBullCows(const FString& Guess) const;
+	void NextLevel();
 
 	// Your declarations go below!
 	private:
@@ -35,4 +36,5 @@ class BULLCOWGAME_API UBullCowCartridge : public UCartridge
 	bool bGameOver;
 	TArray<FString> Words;
 	TArray<FString> Isograms;
+	int32 CurrentLevel;
 };

@@ -2,6 +2,7 @@
 #include "BullCowCartridge.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
+#include "HiddenWordList.h"
 
 void UBullCowCartridge::BeginPlay() // When the game starts
 {
@@ -10,16 +11,19 @@ void UBullCowCartridge::BeginPlay() // When the game starts
     Isograms = GetValidWords(Words);
     FFileHelper::LoadFileToStringArrayWithPredicate(Isograms, *WordListPath, [](const FString& Word)
     {
-         return Word.Len() >= 4 && Word.Len() <= 8 && IsIsogram(Word);
+         return Word.Len() <= 15 && IsIsogram(Word);
     });
-
+    CurrentLevel = 1;
+    
+    PrintLine(TEXT("Welcome to Bull Cow!"));
+    PrintLine(TEXT("Press tab, type your guess, then press enter."));
     SetupGame();
-    PrintLine(TEXT("Number of valid words is %i"), Isograms.Num());
 }
 
 void UBullCowCartridge::OnInput(const FString& PlayerInput) // When the player hits enter
 {
     if (bGameOver) {
+        CurrentLevel = 1;
         ClearScreen();
         SetupGame();
     } else {
@@ -31,22 +35,24 @@ void UBullCowCartridge::SetupGame() {
     HiddenWord = Isograms[FMath::RandRange(0, Isograms.Num() - 1)];
     Lives = HiddenWord.Len();
     bGameOver = false;
-    PrintLine(TEXT("Welcome to Bull Cow!"));
-    PrintLine(TEXT("Press tab, type your guess for \n%i-letter word, then press enter."), HiddenWord.Len());
     PrintLine(TEXT("Word: %s"), *HiddenWord); // Debug Line
     PrintLine(TEXT("Lives: %i"), Lives);
+    PrintLine(TEXT("Current Level: %i"), CurrentLevel);
 }
 
 void UBullCowCartridge::EndGame() {
     bGameOver = true;
+    CurrentLevel = 1;
     PrintLine(TEXT("\nPress enter to play again."));
 }
 
 void UBullCowCartridge::ProcessGuess(const FString& Guess) {
+    
+    // Create Instructions screen/function --help
     if (Guess == HiddenWord) {
         ClearScreen();
-        PrintLine(TEXT("Congrats! That's correct!"));
-        EndGame();
+        ++CurrentLevel;
+        NextLevel();
         return;
     } 
     
@@ -61,9 +67,9 @@ void UBullCowCartridge::ProcessGuess(const FString& Guess) {
         return;
     }
 
-
     --Lives;
     if (Lives > 0) {
+        ClearScreen();
         if (Lives > 1) {
             PrintLine(TEXT("You lost a life.\nYou have %i lives remaining."), Lives);
         } else {
@@ -71,7 +77,6 @@ void UBullCowCartridge::ProcessGuess(const FString& Guess) {
         }
 
         PrintLine(TEXT("Please guess again."));
-        // return;
     } else {
         // This is loss screen; separate function may be good, but not necessary at this point
         ClearScreen();
@@ -81,7 +86,7 @@ void UBullCowCartridge::ProcessGuess(const FString& Guess) {
     }
 
     FBullCowCount BullCowInfo = GetBullCows(Guess);
-    PrintLine(TEXT("Bulls: %i -- Cows: %i."), BullCowInfo.BullsCount, BullCowInfo.CowsCount);
+    PrintLine(TEXT("Bulls: %i | Cows: %i."), BullCowInfo.BullsCount, BullCowInfo.CowsCount);
     if (BullCowInfo.Bulls.Len() > 0) {
         PrintLine(TEXT("Bulls found: %s"), *BullCowInfo.Bulls);
     }
@@ -103,11 +108,23 @@ bool UBullCowCartridge::IsIsogram(const FString& Word) {
     return true;
 }
 
+
+// this function does actual fuck all
 TArray<FString> UBullCowCartridge::GetValidWords(const TArray<FString>& WordList) const {
     TArray<FString> ValidWords;
 
     for (FString Word : WordList) {
-        if (Word.Len() >= 4 && Word.Len() <= 8 && IsIsogram(Word)) {
+        if (Word.Len() <= 2 && IsIsogram(Word) && CurrentLevel <= 5) {
+            ValidWords.Emplace(Word);
+            break;
+        }
+
+        if (Word.Len() >= 4 && Word.Len() <= 6 && IsIsogram(Word) && CurrentLevel > 5 && CurrentLevel <= 10) {
+            ValidWords.Emplace(Word);
+            break;
+        }
+
+        if (Word.Len() > 6 && IsIsogram(Word) && CurrentLevel > 10) {
             ValidWords.Emplace(Word);
         }
     }
@@ -140,4 +157,11 @@ FBullCowCount UBullCowCartridge::GetBullCows(const FString& Guess) const {
     }
 
     return Count;
+}
+
+void UBullCowCartridge::NextLevel() {
+    ClearScreen();
+
+    PrintLine(TEXT("Congrats! That's correct!"));
+    SetupGame();
 }
