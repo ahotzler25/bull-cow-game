@@ -1,6 +1,6 @@
 # 03_BullCowGame
 
-Simple word-guessing game built in Unreal Engine with C++ through GameDev.TV's "Unreal Engine C++ Developer's Course". 
+Simple word-guessing game built in Unreal Engine with C++ through GameDev.TV's "Unreal Engine C++ Developer's Course". I added additional features, such as a level counter (will introduce level progression at a later time) and a "Hangman"-style display of bulls to make the UX more enjoyable and the game overall slightly easier. 
 
 ![Title screen shot](/Screenshots/title-screen-screenshot.PNG)
 
