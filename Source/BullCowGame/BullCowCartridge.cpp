@@ -33,12 +33,12 @@ void UBullCowCartridge::OnInput(const FString& PlayerInput) // When the player h
 
 void UBullCowCartridge::SetupGame() {
     HiddenWord = Isograms[FMath::RandRange(0, Isograms.Num() - 1)];
-    Lives = HiddenWord.Len();
+    Lives = HiddenWord.Len() * 2;
     bGameOver = false;
     // PrintLine(TEXT("Word: %s"), *HiddenWord); // Debug Line
+    PrintLine(TEXT("Level: %i"), CurrentLevel);
     PrintLine(TEXT("The word's length is: %i"), HiddenWord.Len());
     PrintLine(TEXT("Lives: %i"), Lives);
-    PrintLine(TEXT("Current Level: %i"), CurrentLevel);
 }
 
 void UBullCowCartridge::EndGame() {
@@ -166,6 +166,6 @@ FBullCowCount UBullCowCartridge::GetBullCows(const FString& Guess) const {
 void UBullCowCartridge::NextLevel() {
     ClearScreen();
 
-    PrintLine(TEXT("Congrats! That's correct!"));
+    PrintLine(TEXT("Congrats! That's correct!\n"));
     SetupGame();
 }
