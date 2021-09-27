@@ -10,7 +10,7 @@ struct FBullCowCount {
 	int32 BullsCount = 0;
 	int32 CowsCount = 0;
 	FString Bulls = "";
-	// FString Cows = "";
+	FString Cows = "";
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
